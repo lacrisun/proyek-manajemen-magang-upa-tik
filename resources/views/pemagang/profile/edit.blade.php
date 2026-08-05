@@ -19,6 +19,13 @@
             </div>
         @endif
 
+        @if (session('status') === 'device-registered')
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                Perangkat berhasil didaftarkan.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <div class="card shadow mb-4">
             <div class="card-header bg-primary text-white py-3">
                 <h5 class="card-title mb-0">
@@ -137,6 +144,62 @@
             </div>
         </div>
 
+        {{-- ==== TAMBAHAN: Card Registrasi Perangkat ==== --}}
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="card-title mb-0">
+                    <i class="fa-solid fa-mobile-screen me-2"></i> Perangkat Absensi
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (!$user->participant)
+                    <div class="alert alert-secondary mb-0">
+                        Lengkapi data diri peserta terlebih dahulu sebelum mendaftarkan perangkat.
+                    </div>
+                @else
+                    @php
+                        $device = $user->participant->registeredDevice;
+                    @endphp
+
+                    @if ($device && $device->is_active)
+                        <div class="alert alert-info">
+                            <strong>Perangkat terdaftar:</strong> {{ $device->device_model ?? 'Tidak diketahui' }}<br>
+                            <small class="text-muted">
+                                Didaftarkan pada: {{ $device->registered_at?->format('d M Y, H:i') }}
+                                @if ($device->last_used_at)
+                                    &middot; Terakhir dipakai: {{ $device->last_used_at->format('d M Y, H:i') }}
+                                @endif
+                            </small>
+                        </div>
+                        <p class="text-muted">
+                            Anda hanya bisa melakukan absensi menggunakan perangkat ini. Jika Anda mengganti HP,
+                            silakan hubungi admin untuk mereset perangkat terdaftar.
+                        </p>
+                    @else
+                        <div class="alert alert-warning">
+                            Anda belum mendaftarkan perangkat. Daftarkan perangkat yang sedang Anda gunakan sekarang
+                            untuk bisa melakukan absensi.
+                        </div>
+
+                        <form method="post" action="{{ route('pemagang.device.register') }}" id="device-register-form">
+                            @csrf
+                            <input type="hidden" name="device_model" id="device_model">
+                            <input type="hidden" name="device_fingerprint" id="device_fingerprint">
+                            <input type="hidden" name="user_agent" id="user_agent_field">
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-mobile-button me-1"></i> Daftarkan Perangkat Ini
+                            </button>
+                        </form>
+
+                        @error('device_model')
+                            <div class="text-danger mt-2">{{ $message }}</div>
+                        @enderror
+                    @endif
+                @endif
+            </div>
+        </div>
+
         <div class="card shadow mb-4">
             <div class="card-header bg-primary text-white py-3">
                 <h5 class="card-title mb-0">
@@ -150,4 +213,31 @@
         </div>
 
     </div>
+
+    {{-- Script ambil info perangkat sebelum submit form registrasi --}}
+    <script>
+        const deviceForm = document.getElementById('device-register-form');
+        if (deviceForm) {
+            deviceForm.addEventListener('submit', function() {
+                document.getElementById('user_agent_field').value = navigator.userAgent;
+
+                // fingerprint sederhana dari kombinasi info browser
+                const raw = [
+                    navigator.userAgent,
+                    navigator.language,
+                    screen.width + 'x' + screen.height,
+                    screen.colorDepth,
+                    new Date().getTimezoneOffset()
+                ].join('|');
+
+                // hash sederhana (bisa diganti FingerprintJS untuk akurasi lebih tinggi)
+                let hash = 0;
+                for (let i = 0; i < raw.length; i++) {
+                    hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+                    hash |= 0;
+                }
+                document.getElementById('device_fingerprint').value = hash.toString();
+            });
+        }
+    </script>
 @endsection

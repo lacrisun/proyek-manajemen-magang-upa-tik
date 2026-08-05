@@ -30,6 +30,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RedirectController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Pemagang\DeviceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -172,7 +173,11 @@ Route::middleware(['auth', 'role:pemagang'])
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
         Route::resource('changelog', ChangelogController::class)->names('changelog');
-
+        Route::post('/device/register', [DeviceController::class, 'register'])
+            ->name('device.register');
+        Route::post('/attendance/record/{type}', [PemagangAttendanceController::class, 'record'])
+            ->name('attendance.record')
+            ->where('type', 'check-in|check-out');
     });
 
 /*
@@ -237,7 +242,6 @@ Route::middleware(['auth', 'role:atasan'])
         // -- Profil Pengguna (dari Breeze) --
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-
     });
 
 /*
@@ -277,8 +281,7 @@ Route::middleware(['auth', 'role:pembimbing'])
             ->name('task.destroy');
 
         Route::resource('changelog', ChangelogController::class)->names('changelog');
-
     });
 
 // Route autentikasi Breeze
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
