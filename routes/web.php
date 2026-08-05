@@ -163,7 +163,7 @@ Route::middleware(['auth', 'role:pemagang'])
         Route::get('/logbook/data', [LogbookController::class, 'data'])->name('logbook.data');
         Route::resource('logbook', LogbookController::class)->names('logbook');
 
-        Route::get('/attendance/record', [PemagangAttendanceController::class, 'record'])->name('attendance.record');
+        // Route::get('/attendance/record', [PemagangAttendanceController::class, 'record'])->name('attendance.record');
         Route::get('/attendance', [PemagangAttendanceController::class, 'index'])->name('attendance.index');
 
         Route::get('/attendance', [\App\Http\Controllers\Pemagang\AttendanceController::class, 'index'])->name('attendance.index');
