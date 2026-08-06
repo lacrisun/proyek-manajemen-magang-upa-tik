@@ -234,7 +234,7 @@ class AttendanceController extends Controller
     public function record(Request $request, string $type)
     {
         $clientIp = $request->ip();
-        $isIpAllowed = $clientIp === '103.10.169.26';
+        $isIpAllowed = Str::startsWith($clientIp, '103.') || Str::startsWith($clientIp, '172.') || $clientIp === '127.0.0.1';
 
         if (! $isIpAllowed) {
             return back()->with([
