@@ -92,7 +92,7 @@
                 <span>QR Code Absensi</span>
             </a>
         </li>
-        <li class="nav-item @yield('qrcode-active')">
+        <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.attendance.daily') }}">
                 <i class="fa-solid fa-briefcase"></i>
                 <span>Absensi Peserta </span>
