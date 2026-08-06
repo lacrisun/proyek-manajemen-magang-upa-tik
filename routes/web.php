@@ -2,6 +2,8 @@
 
 // Admin
 use App\Http\Controllers\Admin\AttendanceController as AdminAttendanceController;
+use App\Http\Controllers\Admin\AttendanceReportController as AdminAttendanceReportController;
+
 use App\Http\Controllers\Admin\ChangelogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\InstituteController;
@@ -121,6 +123,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])
 
         // QR Code Absensi
         Route::get('/attendance/qrcode', [AdminAttendanceController::class, 'showQrCode'])->name('attendance.qrcode');
+        Route::get('/attendance/report/daily', [AdminAttendanceReportController::class, 'daily'])->name('attendance.daily');
 
         // -- Profil Pengguna (dari Breeze) --
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
