@@ -86,6 +86,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::get('/peserta/{participant}/approve', [ParticipantController::class, 'approve'])->name('peserta.approve');
         Route::get('/peserta/export/excel', [ParticipantController::class, 'exportExcel'])->name('peserta.export.excel');
         Route::get('/peserta/export/pdf', [ParticipantController::class, 'exportPdf'])->name('peserta.export.pdf');
+        Route::post('/peserta/{participant}/device/reset', [ParticipantController::class, 'resetDevice'])->name('peserta.device.reset');
 
         // Pembimbing
         Route::get('/pembimbing/data', [SupervisorController::class, 'data'])->name('pembimbing.data');

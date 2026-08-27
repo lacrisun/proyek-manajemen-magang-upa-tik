@@ -95,11 +95,29 @@ class ParticipantController extends Controller
         // muat relasi untuk tab logbook & absensi (urut terbaru)
         $participant->load([
             'institute',
+            'registeredDevice',
             'logbooks' => fn ($q) => $q->orderByDesc('date')->orderByDesc('id'),
             'attendances' => fn ($q) => $q->orderByDesc('date')->orderByDesc('id'),
         ]);
 
         return view('admin.peserta.detail', compact('participant'));
+    }
+
+    public function resetDevice(Participant $participant): RedirectResponse
+    {
+        $device = $participant->registeredDevice;
+
+        if (! $device) {
+            return redirect()
+                ->route('admin.peserta.show', $participant->id)
+                ->with('error', 'Peserta ini belum memiliki perangkat terdaftar.');
+        }
+
+        $device->update(['is_active' => false]);
+
+        return redirect()
+            ->route('admin.peserta.show', $participant->id)
+            ->with('success', "Perangkat {$participant->nama} berhasil direset. Peserta dapat mendaftarkan perangkat baru.");
     }
 
     public function create()

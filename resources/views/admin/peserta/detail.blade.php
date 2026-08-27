@@ -6,6 +6,45 @@
 @section('content')
     <div class="container-fluid">
 
+        @if ($errors->any())
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    position: 'center',
+                    icon: 'error',
+                    title: "{{ $errors->first() }}",
+                    showConfirmButton: false,
+                    timer: 4000
+                });
+            </script>
+        @endif
+
+        @if (session('success'))
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: "{{ session('success') }}",
+                    showConfirmButton: false,
+                    timer: 4000
+                });
+            </script>
+        @endif
+
+        @if (session('error'))
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    position: 'center',
+                    icon: 'error',
+                    title: "{{ session('error') }}",
+                    showConfirmButton: false,
+                    timer: 4000
+                });
+            </script>
+        @endif
+
         {{-- Header + Tombol Aksi --}}
         <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
             <h1 class="h3 mb-2 text-gray-800">Detail Peserta</h1>
@@ -127,6 +166,52 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Kartu Perangkat Absensi --}}
+            <div class="col-12">
+                <div class="card shadow-sm border-0 mb-2">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-mobile-screen me-2"></i> Perangkat Absensi
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        @php $device = $participant->registeredDevice; @endphp
+
+                        @if ($device && $device->is_active)
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                                <div>
+                                    <div class="mb-1">
+                                        <strong>Perangkat terdaftar:</strong>
+                                        {{ $device->device_model ?? 'Tidak diketahui' }}
+                                    </div>
+                                    <small class="text-muted">
+                                        Didaftarkan pada:
+                                        {{ optional($device->registered_at)->format('d M Y, H:i') ?? '-' }}
+                                        @if ($device->last_used_at)
+                                            &middot; Terakhir dipakai:
+                                            {{ $device->last_used_at->format('d M Y, H:i') }}
+                                        @endif
+                                    </small>
+                                </div>
+
+                                <form method="post"
+                                    action="{{ route('admin.peserta.device.reset', $participant->id) }}"
+                                    onsubmit="return confirm('Reset perangkat terdaftar milik {{ $participant->nama }}? Peserta akan bisa mendaftarkan perangkat baru saat login berikutnya.');">
+                                    @csrf
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-rotate me-1"></i> Registrasi Ulang Perangkat
+                                    </button>
+                                </form>
+                            </div>
+                        @else
+                            <div class="text-muted mb-0">
+                                Peserta belum mendaftarkan perangkat untuk absensi.
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
